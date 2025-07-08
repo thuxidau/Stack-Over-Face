@@ -27,6 +27,8 @@ public class BlockGameView extends View {
 
     private final int BLOCK_SPEED = 10;
     private final int FRAME_DELAY = 16; // ~60fps
+    private float stackOffsetY = 200; // Initial vertical offset from bottom
+    private float stackShiftPerDrop = 45; // How much to move down each time
 
     private Handler handler = new Handler();
 
@@ -39,15 +41,16 @@ public class BlockGameView extends View {
         blockPaint = new Paint();
         blockPaint.setStyle(Paint.Style.FILL);
 
-        blockHeight = 80;
+        blockHeight = 50;
         blockWidth = 400;
 
         post(() -> {
+            float baseY = getHeight() - blockHeight - stackOffsetY; // base block appears "above" bottom
             float baseX = (getWidth() - blockWidth) / 2f;
-            float baseY = getHeight() - blockHeight;
 
             Block baseBlock = new Block(baseX, baseY, blockWidth, blockHeight, Color.RED);
             stackBlocks.add(baseBlock);
+            stackOffsetY -= 400;
 
             float startY = baseY - blockHeight;
             int nextColor = generateNextColor(Color.RED);
@@ -88,12 +91,21 @@ public class BlockGameView extends View {
         if (currentBlock == null) return;
 
         // Set the block's Y position based on stack size
-        float topY = getHeight() - blockHeight * (stackBlocks.size() + 1);
+        float topY;
+
+        if (!stackBlocks.isEmpty()) {
+            Block last = stackBlocks.get(stackBlocks.size() - 1);
+            topY = last.y - blockHeight; // place new block above last one
+        } else {
+            topY = getHeight() - blockHeight - stackOffsetY; // fallback
+        }
+
         currentBlock.y = topY;
 
         // Add to stack
         stackBlocks.add(currentBlock);
         score++;
+        stackOffsetY += stackShiftPerDrop; // whole stack shift down visually every time a block is dropped
 
         // Generate new block with a different color
         int newColor = generateNextColor(currentBlock.color);
@@ -118,14 +130,16 @@ public class BlockGameView extends View {
         // Draw stacked blocks
         for (Block b : stackBlocks) {
             blockPaint.setColor(b.color);
-            canvas.drawRect(b.x, b.y, b.x + b.width, b.y + b.height, blockPaint);
+            canvas.drawRect(b.x, b.y + stackOffsetY, b.x + b.width, b.y + b.height + stackOffsetY, blockPaint);
         }
 
         // Draw current moving block
         if (currentBlock != null) {
             blockPaint.setColor(currentBlock.color);
-            canvas.drawRect(currentBlock.x, currentBlock.y,
-                    currentBlock.x + currentBlock.width, currentBlock.y + currentBlock.height, blockPaint);
+            canvas.drawRect(currentBlock.x, currentBlock.y + stackOffsetY,
+                    currentBlock.x + currentBlock.width,
+                    currentBlock.y + currentBlock.height + stackOffsetY,
+                    blockPaint);
         }
     }
 
