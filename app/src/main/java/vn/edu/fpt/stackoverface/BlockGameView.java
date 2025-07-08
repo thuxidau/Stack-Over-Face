@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -25,10 +26,10 @@ public class BlockGameView extends View {
     private List<Float> stackHeights = new ArrayList<>();
     private int score = 0;
 
-    private final int BLOCK_SPEED = 10;
+    private final int BLOCK_SPEED = 5;
     private final int FRAME_DELAY = 16; // ~60fps
     private float stackOffsetY = 200; // Initial vertical offset from bottom
-    private float stackShiftPerDrop = 45; // How much to move down each time
+    private float stackShiftPerDrop = 35; // How much to move down each time
 
     private Handler handler = new Handler();
 
@@ -41,8 +42,8 @@ public class BlockGameView extends View {
         blockPaint = new Paint();
         blockPaint.setStyle(Paint.Style.FILL);
 
-        blockHeight = 50;
-        blockWidth = 400;
+        blockHeight = 40;
+        blockWidth = 300;
 
         post(() -> {
             float baseY = getHeight() - blockHeight - stackOffsetY; // base block appears "above" bottom
@@ -129,18 +130,63 @@ public class BlockGameView extends View {
 
         // Draw stacked blocks
         for (Block b : stackBlocks) {
-            blockPaint.setColor(b.color);
-            canvas.drawRect(b.x, b.y + stackOffsetY, b.x + b.width, b.y + b.height + stackOffsetY, blockPaint);
+            drawIsometricBlock(canvas, b);
         }
 
         // Draw current moving block
         if (currentBlock != null) {
-            blockPaint.setColor(currentBlock.color);
-            canvas.drawRect(currentBlock.x, currentBlock.y + stackOffsetY,
-                    currentBlock.x + currentBlock.width,
-                    currentBlock.y + currentBlock.height + stackOffsetY,
-                    blockPaint);
+            drawIsometricBlock(canvas, currentBlock);
         }
+    }
+
+    private void drawIsometricBlock(Canvas canvas, Block block) {
+        float centerX = block.x;
+        float centerY = block.y + stackOffsetY;
+        float size = block.width;
+        float height = block.height;
+
+        float half = size / 2f;
+        float quarter = size / 4f;
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.FILL);
+
+        // --- TOP FACE ---
+        Path top = new Path();
+        top.moveTo(centerX, centerY - quarter);            // top point
+        top.lineTo(centerX + half, centerY);               // right point
+        top.lineTo(centerX, centerY + quarter);            // bottom point
+        top.lineTo(centerX - half, centerY);               // left point
+        top.close();
+        paint.setColor(block.color);
+        canvas.drawPath(top, paint);
+
+        // --- RIGHT SIDE ---
+        Path right = new Path();
+        right.moveTo(centerX, centerY + quarter);          // top-left of side
+        right.lineTo(centerX + half, centerY);             // top-right
+        right.lineTo(centerX + half, centerY + height);    // bottom-right
+        right.lineTo(centerX, centerY + height + quarter); // bottom-left
+        right.close();
+        paint.setColor(darkenColor(block.color, 0.75f));
+        canvas.drawPath(right, paint);
+
+        // --- LEFT SIDE ---
+        Path left = new Path();
+        left.moveTo(centerX - half, centerY);              // top-left
+        left.lineTo(centerX, centerY + quarter);           // top-right
+        left.lineTo(centerX, centerY + height + quarter);  // bottom-right
+        left.lineTo(centerX - half, centerY + height);     // bottom-left
+        left.close();
+        paint.setColor(darkenColor(block.color, 0.55f));
+        canvas.drawPath(left, paint);
+    }
+
+    private int darkenColor(int color, float factor) {
+        int r = (int)(Color.red(color) * factor);
+        int g = (int)(Color.green(color) * factor);
+        int b = (int)(Color.blue(color) * factor);
+        return Color.rgb(Math.min(255, r), Math.min(255, g), Math.min(255, b));
     }
 
     @Override
