@@ -16,8 +16,8 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
     private final Runnable blinkCallback;
 
     private long lastBlinkTime = 0;
-    private static final long BLINK_COOLDOWN = 500;
-    private static final float BLINK_THRESHOLD = 0.4f;
+    private static final long BLINK_COOLDOWN = 300;
+    private static final float BLINK_THRESHOLD = 0.2f;
 
     public FaceAnalyzer(Runnable blinkCallback) {
         this.blinkCallback = blinkCallback;

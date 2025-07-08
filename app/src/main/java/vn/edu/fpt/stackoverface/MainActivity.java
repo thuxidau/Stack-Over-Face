@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvScore = findViewById(R.id.tvScore);
 
         faceAnalyzer = new FaceAnalyzer(() -> {
-            runOnUiThread(() -> {
+            // this should be *instant*
+            gameView.post(() -> {
                 gameView.dropBlock();
                 tvScore.setText("Score: " + gameView.getScore());
             });
