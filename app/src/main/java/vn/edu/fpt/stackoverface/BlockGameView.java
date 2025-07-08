@@ -17,20 +17,15 @@ public class BlockGameView extends View {
 
     private List<Block> stackBlocks = new ArrayList<>();
     private Block currentBlock;
-
     private Paint blockPaint;
     private float blockWidth, blockHeight;
-    private float blockX, blockY;
     private boolean movingRight = true;
-
     private List<Float> stackHeights = new ArrayList<>();
     private int score = 0;
-
-    private final int BLOCK_SPEED = 5;
+    private final int BLOCK_SPEED = 8;
     private final int FRAME_DELAY = 16; // ~60fps
     private float stackOffsetY = 200; // Initial vertical offset from bottom
     private float stackShiftPerDrop = 35; // How much to move down each time
-
     private Handler handler = new Handler();
 
     public BlockGameView(Context context, AttributeSet attrs) {
@@ -46,16 +41,16 @@ public class BlockGameView extends View {
         blockWidth = 300;
 
         post(() -> {
-            float baseY = getHeight() - blockHeight - stackOffsetY; // base block appears "above" bottom
-            float baseX = (getWidth() - blockWidth) / 2f;
+            float centerX = getWidth() / 2f;
+            float baseY = getHeight() - blockHeight - stackOffsetY - 100; // raised above bottom
 
-            Block baseBlock = new Block(baseX, baseY, blockWidth, blockHeight, Color.RED);
+            Block baseBlock = new Block(centerX, baseY, blockWidth, blockHeight, Color.RED);
             stackBlocks.add(baseBlock);
             stackOffsetY -= 400;
 
             float startY = baseY - blockHeight;
             int nextColor = generateNextColor(Color.RED);
-            currentBlock = new Block(0, startY, blockWidth, blockHeight, nextColor);
+            currentBlock = new Block(centerX, startY, blockWidth, blockHeight, nextColor);
 
             startMoving();
         });
@@ -73,16 +68,18 @@ public class BlockGameView extends View {
     }
 
     private void moveBlock() {
+        float halfWidth = currentBlock.width / 2f;
+
         if (movingRight) {
             currentBlock.x += BLOCK_SPEED;
-            if (currentBlock.x + currentBlock.width > getWidth()) {
-                currentBlock.x = getWidth() - currentBlock.width;
+            if (currentBlock.x + halfWidth >= getWidth()) {
+                currentBlock.x = getWidth() - halfWidth;
                 movingRight = false;
             }
         } else {
             currentBlock.x -= BLOCK_SPEED;
-            if (currentBlock.x < 0) {
-                currentBlock.x = 0;
+            if (currentBlock.x - halfWidth <= 0) {
+                currentBlock.x = halfWidth;
                 movingRight = true;
             }
         }
