@@ -38,7 +38,10 @@ public class MainActivity extends AppCompatActivity {
         TextView tvScore = findViewById(R.id.tvScore);
 
         faceAnalyzer = new FaceAnalyzer(() -> {
-            runOnUiThread(() -> gameView.dropBlock());
+            runOnUiThread(() -> {
+                gameView.dropBlock();
+                tvScore.setText("Score: " + gameView.getScore());
+            });
         });
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -47,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startCamera();
         }
-
-        runOnUiThread(() -> tvScore.setText("Score: " + gameView.getScore()));
     }
 
     private void startCamera() {
