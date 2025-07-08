@@ -15,6 +15,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.cameraPreview);
         gameView = findViewById(R.id.gameView);
+        TextView tvScore = findViewById(R.id.tvScore);
 
         faceAnalyzer = new FaceAnalyzer(() -> {
             runOnUiThread(() -> gameView.dropBlock());
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startCamera();
         }
+
+        runOnUiThread(() -> tvScore.setText("Score: " + gameView.getScore()));
     }
 
     private void startCamera() {

@@ -14,6 +14,9 @@ import java.util.List;
 
 public class BlockGameView extends View {
 
+    private List<Block> stackBlocks = new ArrayList<>();
+    private Block currentBlock;
+
     private Paint blockPaint;
     private float blockWidth, blockHeight;
     private float blockX, blockY;
@@ -34,16 +37,24 @@ public class BlockGameView extends View {
 
     private void init() {
         blockPaint = new Paint();
-        blockPaint.setColor(Color.RED);
         blockPaint.setStyle(Paint.Style.FILL);
 
         blockHeight = 80;
-        blockWidth = 300;
+        blockWidth = 400;
 
-        // Start with base block
-        stackHeights.add(getHeight() - blockHeight);
+        post(() -> {
+            float baseX = (getWidth() - blockWidth) / 2f;
+            float baseY = getHeight() - blockHeight;
 
-        startMoving();
+            Block baseBlock = new Block(baseX, baseY, blockWidth, blockHeight, Color.RED);
+            stackBlocks.add(baseBlock);
+
+            float startY = baseY - blockHeight;
+            int nextColor = generateNextColor(Color.RED);
+            currentBlock = new Block(0, startY, blockWidth, blockHeight, nextColor);
+
+            startMoving();
+        });
     }
 
     private void startMoving() {
@@ -59,36 +70,45 @@ public class BlockGameView extends View {
 
     private void moveBlock() {
         if (movingRight) {
-            blockX += BLOCK_SPEED;
-            if (blockX + blockWidth > getWidth()) {
-                blockX = getWidth() - blockWidth;
+            currentBlock.x += BLOCK_SPEED;
+            if (currentBlock.x + currentBlock.width > getWidth()) {
+                currentBlock.x = getWidth() - currentBlock.width;
                 movingRight = false;
             }
         } else {
-            blockX -= BLOCK_SPEED;
-            if (blockX < 0) {
-                blockX = 0;
+            currentBlock.x -= BLOCK_SPEED;
+            if (currentBlock.x < 0) {
+                currentBlock.x = 0;
                 movingRight = true;
             }
         }
     }
 
     public void dropBlock() {
-        float topY = getHeight() - blockHeight * (stackHeights.size() + 1);
-        stackHeights.add(topY);
-        blockY = topY;
+        if (currentBlock == null) return;
 
+        // Set the block's Y position based on stack size
+        float topY = getHeight() - blockHeight * (stackBlocks.size() + 1);
+        currentBlock.y = topY;
+
+        // Add to stack
+        stackBlocks.add(currentBlock);
         score++;
-        blockPaint.setColor(generateNextColor(score));
 
-        // Reset block to top
-        blockX = 0;
+        // Generate new block with a different color
+        int newColor = generateNextColor(currentBlock.color);
+        float newY = topY - blockHeight;
+        currentBlock = new Block(0, newY, blockWidth, blockHeight, newColor);
         movingRight = true;
     }
 
-    private int generateNextColor(int step) {
-        float fraction = Math.min(1f, step / 10f); // Simple gradient cap at 10 blocks
-        return Color.HSVToColor(new float[]{240f * (1 - fraction), 1f, 1f});
+    private int generateNextColor(int previousColor) {
+        // Change HUE gradually, wrap from red (0) to blue (240)
+        float[] hsv = new float[]{0f, 1f, 1f}; // default red
+        Color.colorToHSV(previousColor, hsv);
+        hsv[0] = (hsv[0] + 30f) % 360f; // increment hue
+
+        return Color.HSVToColor(hsv);
     }
 
     @Override
@@ -96,14 +116,17 @@ public class BlockGameView extends View {
         super.onDraw(canvas);
 
         // Draw stacked blocks
-        for (int i = 0; i < stackHeights.size(); i++) {
-            float y = stackHeights.get(i);
-            canvas.drawRect(0, y, blockWidth, y + blockHeight, blockPaint);
+        for (Block b : stackBlocks) {
+            blockPaint.setColor(b.color);
+            canvas.drawRect(b.x, b.y, b.x + b.width, b.y + b.height, blockPaint);
         }
 
-        // Draw moving block
-        float currentY = getHeight() - blockHeight * (stackHeights.size() + 1);
-        canvas.drawRect(blockX, currentY, blockX + blockWidth, currentY + blockHeight, blockPaint);
+        // Draw current moving block
+        if (currentBlock != null) {
+            blockPaint.setColor(currentBlock.color);
+            canvas.drawRect(currentBlock.x, currentBlock.y,
+                    currentBlock.x + currentBlock.width, currentBlock.y + currentBlock.height, blockPaint);
+        }
     }
 
     @Override
@@ -114,5 +137,9 @@ public class BlockGameView extends View {
             return true;
         }
         return false;
+    }
+
+    public int getScore() {
+        return score;
     }
 }
