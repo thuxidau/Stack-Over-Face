@@ -22,10 +22,10 @@ public class BlockGameView extends View {
     private boolean movingRight = true;
     private List<Float> stackHeights = new ArrayList<>();
     private int score = 0;
-    private final int BLOCK_SPEED = 6;
+    private final int BLOCK_SPEED = 5;
     private final int FRAME_DELAY = 16; // ~60fps
     private float stackOffsetY = 200; // Initial vertical offset from bottom
-    private float stackShiftPerDrop = 35; // How much to move down each time
+    private float stackShiftPerDrop = 30; // How much to move down each time
     private Handler handler = new Handler();
 
     public BlockGameView(Context context, AttributeSet attrs) {
@@ -37,8 +37,8 @@ public class BlockGameView extends View {
         blockPaint = new Paint();
         blockPaint.setStyle(Paint.Style.FILL);
 
-        blockHeight = 40;
-        blockWidth = 300;
+        blockHeight = 30;
+        blockWidth = 400;
 
         post(() -> {
             float centerX = getWidth() / 2f;
@@ -108,8 +108,18 @@ public class BlockGameView extends View {
         // Generate new block with a different color
         int newColor = generateNextColor(currentBlock.color);
         float newY = topY - blockHeight;
-        currentBlock = new Block(0, newY, blockWidth, blockHeight, newColor);
-        movingRight = true;
+        float screenWidth = getWidth();
+
+        // Alternate movement direction every 2 drops
+        movingRight = (score % 2 == 0);
+
+        // Set starting X based on direction
+        float startX = movingRight
+                ? blockWidth / 2f                   // Start at left edge
+                : screenWidth - blockWidth / 2f;    // Start at right edge
+
+        // Create the new block at correct position
+        currentBlock = new Block(startX, newY, blockWidth, blockHeight, newColor);
     }
 
     private int generateNextColor(int previousColor) {
