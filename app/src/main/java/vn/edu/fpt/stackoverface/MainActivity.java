@@ -41,12 +41,12 @@ public class MainActivity extends AppCompatActivity {
             // this should be *instant*
             gameView.post(() -> {
                 gameView.dropBlock();
-                tvScore.setText("Score: " + gameView.getScore());
+                tvScore.setText(getString(R.string.score, gameView.getScore()));
             });
 
             gameView.setGameOverCallback(() -> {
                 runOnUiThread(() -> {
-                    // Show score, best score, play again button here
+//                    tvScore.setText(getString(R.string.score, gameView.getScore()));
                 });
             });
         });

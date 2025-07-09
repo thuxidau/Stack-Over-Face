@@ -108,8 +108,7 @@ public class BlockGameView extends View {
         }
 
         // Trimmed block values
-        float newCenterX = (overlapLeft + overlapRight) / 2f;
-        currentBlock.x = newCenterX;
+        currentBlock.x = (overlapLeft + overlapRight) / 2f;
         currentBlock.width = overlapWidth;
 
         // Stack it
@@ -130,7 +129,7 @@ public class BlockGameView extends View {
                 : screenWidth - blockWidth / 2f;
 
         // Start full width again for next block
-        currentBlock = new Block(startX, newY, blockWidth, blockHeight, newColor);
+        currentBlock = new Block(startX, newY, currentBlock.width, blockHeight, newColor);
     }
 
     private int generateNextColor(int previousColor) {
