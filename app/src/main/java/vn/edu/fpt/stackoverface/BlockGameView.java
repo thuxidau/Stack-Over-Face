@@ -27,6 +27,7 @@ public class BlockGameView extends View {
     private float stackOffsetY = 200; // Initial vertical offset from bottom
     private float stackShiftPerDrop = 30; // How much to move down each time
     private Handler handler = new Handler();
+    private Runnable gameOverCallback;
 
     public BlockGameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -88,37 +89,47 @@ public class BlockGameView extends View {
     public void dropBlock() {
         if (currentBlock == null) return;
 
-        // Set the block's Y position based on stack size
-        float topY;
+        Block last = stackBlocks.get(stackBlocks.size() - 1);
 
-        if (!stackBlocks.isEmpty()) {
-            Block last = stackBlocks.get(stackBlocks.size() - 1);
-            topY = last.y - blockHeight; // place new block above last one
-        } else {
-            topY = getHeight() - blockHeight - stackOffsetY; // fallback
+        float lastLeft = last.x - last.width / 2f;
+        float lastRight = last.x + last.width / 2f;
+
+        float currLeft = currentBlock.x - currentBlock.width / 2f;
+        float currRight = currentBlock.x + currentBlock.width / 2f;
+
+        float overlapLeft = Math.max(lastLeft, currLeft);
+        float overlapRight = Math.min(lastRight, currRight);
+        float overlapWidth = overlapRight - overlapLeft;
+
+        if (overlapWidth <= 0) {
+            // No overlap – GAME OVER
+            gameOverCallback.run();
+            return;
         }
 
-        currentBlock.y = topY;
+        // Trimmed block values
+        float newCenterX = (overlapLeft + overlapRight) / 2f;
+        currentBlock.x = newCenterX;
+        currentBlock.width = overlapWidth;
 
-        // Add to stack
+        // Stack it
+        currentBlock.y = last.y - blockHeight;
         stackBlocks.add(currentBlock);
-        score++;
-        stackOffsetY += stackShiftPerDrop; // whole stack shift down visually every time a block is dropped
 
-        // Generate new block with a different color
+        score++;
+        stackOffsetY += stackShiftPerDrop;
+
+        // Create next block
         int newColor = generateNextColor(currentBlock.color);
-        float newY = topY - blockHeight;
+        float newY = currentBlock.y - blockHeight;
         float screenWidth = getWidth();
 
-        // Alternate movement direction every 2 drops
         movingRight = (score % 2 == 0);
-
-        // Set starting X based on direction
         float startX = movingRight
-                ? blockWidth / 2f                   // Start at left edge
-                : screenWidth - blockWidth / 2f;    // Start at right edge
+                ? blockWidth / 2f
+                : screenWidth - blockWidth / 2f;
 
-        // Create the new block at correct position
+        // Start full width again for next block
         currentBlock = new Block(startX, newY, blockWidth, blockHeight, newColor);
     }
 
@@ -208,5 +219,9 @@ public class BlockGameView extends View {
 
     public int getScore() {
         return score;
+    }
+
+    public void setGameOverCallback(Runnable callback) {
+        this.gameOverCallback = callback;
     }
 }

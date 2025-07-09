@@ -43,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
                 gameView.dropBlock();
                 tvScore.setText("Score: " + gameView.getScore());
             });
+
+            gameView.setGameOverCallback(() -> {
+                runOnUiThread(() -> {
+                    // Show score, best score, play again button here
+                });
+            });
         });
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
