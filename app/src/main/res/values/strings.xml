@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Stack Over Face</string>
     <string name="score">Score: %1$d</string>
-    <string name="start_screen_background">background</string>
     <string name="high_score">High Score: %1$d</string>
     <string name="blink_to_play">Blink to Play</string>
     <string name="settings">Settings</string>
