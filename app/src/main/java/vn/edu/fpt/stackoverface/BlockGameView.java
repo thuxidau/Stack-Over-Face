@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class BlockGameView extends View {
@@ -20,11 +21,11 @@ public class BlockGameView extends View {
     private Paint blockPaint;
     private float blockWidth, blockHeight;
     private boolean movingRight = true;
-    private List<Float> stackHeights = new ArrayList<>();
+    private final List<FallingBlock> fallingBlocks = new ArrayList<>();
     private int score = 0;
     private final int BLOCK_SPEED = 5;
     private final int FRAME_DELAY = 16; // ~60fps
-    private float stackOffsetY = 200; // Initial vertical offset from bottom
+    private static float stackOffsetY = 200; // Initial vertical offset from bottom
     private float stackShiftPerDrop = 30; // How much to move down each time
     private Handler handler = new Handler();
     private Runnable gameOverCallback;
@@ -111,6 +112,20 @@ public class BlockGameView extends View {
         currentBlock.x = (overlapLeft + overlapRight) / 2f;
         currentBlock.width = overlapWidth;
 
+        // Cut off redundant pieces
+        if (currLeft < overlapLeft) {
+            // Left cut-off
+            float cutWidth = overlapLeft - currLeft;
+            float cutX = currLeft + cutWidth / 2f;
+            fallingBlocks.add(new FallingBlock(cutX, currentBlock.y, cutWidth, blockHeight, currentBlock.color));
+        }
+        if (currRight > overlapRight) {
+            // Right cut-off
+            float cutWidth = currRight - overlapRight;
+            float cutX = overlapRight + cutWidth / 2f;
+            fallingBlocks.add(new FallingBlock(cutX, currentBlock.y, cutWidth, blockHeight, currentBlock.color));
+        }
+
         // Stack it
         currentBlock.y = last.y - blockHeight;
         stackBlocks.add(currentBlock);
@@ -145,6 +160,18 @@ public class BlockGameView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        Iterator<FallingBlock> iterator = fallingBlocks.iterator();
+        while (iterator.hasNext()) {
+            FallingBlock fb = iterator.next();
+            fb.update();
+            fb.draw(canvas, blockPaint);
+
+            // Remove if it falls out of screen
+            if (fb.y + fb.height + stackOffsetY > getHeight() + 200) {
+                iterator.remove();
+            }
+        }
+
         // Draw stacked blocks
         for (Block b : stackBlocks) {
             drawIsometricBlock(canvas, b);
@@ -156,7 +183,7 @@ public class BlockGameView extends View {
         }
     }
 
-    private void drawIsometricBlock(Canvas canvas, Block block) {
+    protected static void drawIsometricBlock(Canvas canvas, Block block) {
         float centerX = block.x;
         float centerY = block.y + stackOffsetY;
         float size = block.width;
@@ -199,7 +226,7 @@ public class BlockGameView extends View {
         canvas.drawPath(left, paint);
     }
 
-    private int darkenColor(int color, float factor) {
+    private static int darkenColor(int color, float factor) {
         int r = (int)(Color.red(color) * factor);
         int g = (int)(Color.green(color) * factor);
         int b = (int)(Color.blue(color) * factor);
