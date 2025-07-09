@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/gameRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -21,10 +22,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
+        android:background="@android:color/transparent"
         android:gravity="center_vertical"
-        android:background="@android:color/transparent">
+        android:orientation="horizontal"
+        android:padding="@dimen/padding">
 
         <!-- Score Display -->
         <TextView
@@ -32,23 +33,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Score: 0"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
             android:shadowColor="#000000"
             android:shadowDx="2"
             android:shadowDy="2"
-            android:shadowRadius="3" />
+            android:shadowRadius="3"
+            android:text="@string/score"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/score_text_size" />
 
-        <!-- Settings Button -->
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_preferences"
-            android:background="@android:color/transparent"
-            android:contentDescription="Settings"
-            app:tint="#FFFFFF" />
     </LinearLayout>
 
 </FrameLayout>

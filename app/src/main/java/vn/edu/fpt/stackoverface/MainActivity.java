@@ -37,17 +37,21 @@ public class MainActivity extends AppCompatActivity {
         gameView = findViewById(R.id.gameView);
         TextView tvScore = findViewById(R.id.tvScore);
 
+        // Set initial score (0) after layout is ready
+        gameView.post(() -> {
+            tvScore.setText(getString(R.string.score, gameView.getScore()));
+        });
+
+        gameView.setGameOverCallback(() -> {
+            runOnUiThread(() -> {
+                tvScore.setText(getString(R.string.score, gameView.getScore()));
+            });
+        });
+
         faceAnalyzer = new FaceAnalyzer(() -> {
-            // this should be *instant*
             gameView.post(() -> {
                 gameView.dropBlock();
                 tvScore.setText(getString(R.string.score, gameView.getScore()));
-            });
-
-            gameView.setGameOverCallback(() -> {
-                runOnUiThread(() -> {
-//                    tvScore.setText(getString(R.string.score, gameView.getScore()));
-                });
             });
         });
 

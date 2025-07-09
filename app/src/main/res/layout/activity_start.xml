@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background image -->
+    <ImageView
+        android:id="@+id/bgImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:background="@android:mipmap/sym_def_app_icon"
+        android:contentDescription="@string/start_screen_background"
+        android:scaleType="centerCrop" />
+
+    <!-- Game Title -->
+    <TextView
+        android:id="@+id/tvGameName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="216dp"
+        android:text="@string/app_name"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/game_name_text_size"
+        android:textStyle="bold" />
+
+    <!-- Highest Score -->
+    <TextView
+        android:id="@+id/tvHighScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/high_score"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/score_text_size" />
+
+    <!-- Blink to Play Button -->
+    <Button
+        android:id="@+id/btnBlinkPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="516dp"
+        android:text="@string/blink_to_play" />
+
+    <!-- Settings Button (Top-right) -->
+    <ImageButton
+        android:id="@+id/btnSettings"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/settings"
+        android:layout_margin="16dp"
+        app:tint="@android:color/white" />
+
+    <!-- Instructions Button (Bottom-right) -->
+    <ImageButton
+        android:id="@+id/btnInstructions"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_info_details"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/instructions"
+        android:layout_margin="16dp"
+        app:tint="@android:color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
