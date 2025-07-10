@@ -1,9 +1,7 @@
 package vn.edu.fpt.stackoverface;
 
 import android.content.Context;
-import android.support.v4.os.ResultReceiver;
 
-import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.camera.core.ExperimentalGetImage;
@@ -11,8 +9,10 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
 import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.face.*;
 import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceDetection;
+import com.google.mlkit.vision.face.FaceDetector;
+import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 public class FaceAnalyzer implements ImageAnalysis.Analyzer {
 

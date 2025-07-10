@@ -30,9 +30,19 @@ public class BlockGameView extends View {
     private Handler handler = new Handler();
     private Runnable gameOverCallback;
     private boolean isGameOver = false;
+    private boolean tapEnabled = true;
+    private Runnable scoreUpdateCallback;
 
     public void setGameOver(boolean over) {
         isGameOver = over;
+    }
+
+    public void setTapEnabled(boolean enabled) {
+        this.tapEnabled = enabled;
+    }
+
+    public void setScoreUpdateCallback(Runnable callback) {
+        this.scoreUpdateCallback = callback;
     }
 
     public BlockGameView(Context context, AttributeSet attrs) {
@@ -140,6 +150,10 @@ public class BlockGameView extends View {
         score++;
         stackOffsetY += stackShiftPerDrop;
 
+        if (scoreUpdateCallback != null) {
+            scoreUpdateCallback.run();
+        }
+
         // Create next block
         int newColor = generateNextColor(currentBlock.color);
         float newY = currentBlock.y - blockHeight;
@@ -242,7 +256,7 @@ public class BlockGameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isGameOver) return false;
+        if (isGameOver || !tapEnabled) return false;
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             dropBlock();

@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         // Set initial score (0) after layout is ready
         gameView.post(() -> {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
+            gameView.setTapEnabled(false);
         });
 
         faceAnalyzer = new FaceAnalyzer(this, () -> {

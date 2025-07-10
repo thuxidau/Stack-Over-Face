@@ -24,6 +24,13 @@ public class TapModeActivity extends AppCompatActivity {
 
         gameView.post(() -> {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
+            gameView.setTapEnabled(true);
+        });
+
+        gameView.setScoreUpdateCallback(() -> {
+            runOnUiThread(() -> {
+                tvScore.setText(getString(R.string.score, gameView.getScore()));
+            });
         });
 
         gameView.setGameOverCallback(() -> {
