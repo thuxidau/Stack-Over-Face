@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private PreviewView previewView;
     private BlockGameView gameView;
     private FaceAnalyzer faceAnalyzer;
+    private AlertDialog faceAlertDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
         });
 
-        faceAnalyzer = new FaceAnalyzer(() -> {
+        faceAnalyzer = new FaceAnalyzer(this, () -> {
             gameView.post(() -> {
                 gameView.dropBlock();
                 tvScore.setText(getString(R.string.score, gameView.getScore()));
@@ -156,14 +157,22 @@ public class MainActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
 
         runOnUiThread(() -> {
-            new AlertDialog.Builder(MainActivity.this)
+            if (faceAlertDialog != null && faceAlertDialog.isShowing()) return;
+
+            faceAlertDialog = new AlertDialog.Builder(MainActivity.this)
                     .setTitle("Face Not Detected")
                     .setMessage("Face not detected. Try again or switch to Tap Mode?")
-                    .setCancelable(false) // prevent flickering/multiple alerts
+                    .setCancelable(false)
                     .setPositiveButton("Try Again", (d, w) -> {
-                        FaceAnalyzer.lastFaceTime = System.currentTimeMillis(); // reset face detection timeout
+                        FaceAnalyzer.lastFaceTime = System.currentTimeMillis();
+                        FaceAnalyzer.faceWarningShown = false; // allow warning to show again if still no face
+                        faceAlertDialog = null;
                     })
-                    .setNegativeButton("Switch to Tap Mode", (d, w) -> switchToTapMode())
+                    .setNegativeButton("Switch to Tap Mode", (d, w) -> {
+                        switchToTapMode();
+                        faceAlertDialog = null;
+                    })
+                    .setOnDismissListener(dialog -> faceAlertDialog = null)
                     .show();
         });
     }
@@ -197,6 +206,15 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("Switch", (d, w) -> switchToTapMode())
                     .setNegativeButton("Exit", (d, w) -> finish())
                     .show();
+        });
+    }
+
+    public void dismissFaceAlert() {
+        runOnUiThread(() -> {
+            if (faceAlertDialog != null && faceAlertDialog.isShowing()) {
+                faceAlertDialog.dismiss();
+                faceAlertDialog = null;
+            }
         });
     }
 }

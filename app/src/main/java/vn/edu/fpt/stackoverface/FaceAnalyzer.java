@@ -1,5 +1,6 @@
 package vn.edu.fpt.stackoverface;
 
+import android.content.Context;
 import android.support.v4.os.ResultReceiver;
 
 import androidx.activity.ComponentActivity;
@@ -15,16 +16,18 @@ import com.google.mlkit.vision.face.Face;
 
 public class FaceAnalyzer implements ImageAnalysis.Analyzer {
 
+    private final Context context;
     private final FaceDetector detector;
     private final Runnable blinkCallback;
     private Runnable faceNotDetectedCallback;
-    private boolean faceWarningShown = false;
+    public static boolean faceWarningShown = false;
     private long lastBlinkTime = 0;
     public static long lastFaceTime = System.currentTimeMillis();
     private static final long BLINK_COOLDOWN = 300;
-    private static final float BLINK_THRESHOLD = 0.2f;
+    private static final float BLINK_THRESHOLD = 0.4f;
 
-    public FaceAnalyzer(Runnable blinkCallback) {
+    public FaceAnalyzer(Context context, Runnable blinkCallback) {
+        this.context = context;
         this.blinkCallback = blinkCallback;
 
         FaceDetectorOptions options = new FaceDetectorOptions.Builder()
@@ -54,6 +57,11 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
                     lastFaceTime = System.currentTimeMillis(); // face found
                     faceWarningShown = false; // reset flag when face returns
 
+                    // dismiss alert if it's showing
+                    if (context instanceof MainActivity) {
+                        ((MainActivity) context).dismissFaceAlert();
+                    }
+
                     Face face = faces.get(0);
                     Float leftEye = face.getLeftEyeOpenProbability();
                     Float rightEye = face.getRightEyeOpenProbability();
@@ -71,7 +79,8 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
                 }
                 // face not found
                 else {
-                    if (!faceWarningShown && System.currentTimeMillis() - lastFaceTime > 3000) {
+                    long now = System.currentTimeMillis();
+                    if (!faceWarningShown && now - lastFaceTime > 3000) {
                         faceWarningShown = true;
                         faceNotDetectedCallback.run();
                     }
