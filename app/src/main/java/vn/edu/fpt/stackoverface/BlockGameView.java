@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -32,6 +33,9 @@ public class BlockGameView extends View {
     private boolean isGameOver = false;
     private boolean tapEnabled = true;
     private Runnable scoreUpdateCallback;
+    private MediaPlayer dropSoundPlayer;
+    private Context context;
+
 
     public void setGameOver(boolean over) {
         isGameOver = over;
@@ -43,6 +47,11 @@ public class BlockGameView extends View {
 
     public void setScoreUpdateCallback(Runnable callback) {
         this.scoreUpdateCallback = callback;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+        dropSoundPlayer = MediaPlayer.create(context, R.raw.drop_block);
     }
 
     public BlockGameView(Context context, AttributeSet attrs) {
@@ -146,6 +155,10 @@ public class BlockGameView extends View {
         // Stack it
         currentBlock.y = last.y - blockHeight;
         stackBlocks.add(currentBlock);
+
+        if (dropSoundPlayer != null) {
+            dropSoundPlayer.start();
+        }
 
         score++;
         stackOffsetY += stackShiftPerDrop;

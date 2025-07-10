@@ -2,6 +2,7 @@ package vn.edu.fpt.stackoverface;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -25,6 +26,7 @@ public class TapModeActivity extends AppCompatActivity {
         gameView.post(() -> {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
             gameView.setTapEnabled(true);
+            gameView.setContext(this); // Pass context for sound setup
         });
 
         gameView.setScoreUpdateCallback(() -> {
@@ -35,6 +37,9 @@ public class TapModeActivity extends AppCompatActivity {
 
         gameView.setGameOverCallback(() -> {
             runOnUiThread(() -> {
+                MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
+                gameOverPlayer.start();
+
                 int score = gameView.getScore();
 
                 SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);

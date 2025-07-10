@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         faceAnalyzer = new FaceAnalyzer(this, () -> {
             gameView.post(() -> {
                 gameView.dropBlock();
+                gameView.setContext(this); // Pass context for sound setup
                 tvScore.setText(getString(R.string.score, gameView.getScore()));
             });
         });
@@ -66,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 gameView.setGameOver(true); // stop updates and input
                 faceAnalyzer.stop();
+
+                MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
+                gameOverPlayer.start();
 
                 int score = gameView.getScore();
 

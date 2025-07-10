@@ -15,6 +15,9 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        Intent musicIntent = new Intent(this, MusicService.class);
+        startService(musicIntent);
+
         TextView tvHighScore = findViewById(R.id.tvHighScore);
 
         // Read from SharedPreferences
@@ -29,5 +32,17 @@ public class StartActivity extends AppCompatActivity {
             Intent intent = new Intent(StartActivity.this, MainActivity.class); // <- this should be your gameplay activity
             startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this, MusicService.class));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopService(new Intent(this, MusicService.class));
     }
 }
