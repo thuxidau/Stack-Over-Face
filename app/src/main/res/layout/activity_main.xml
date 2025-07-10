@@ -43,4 +43,73 @@
 
     </LinearLayout>
 
+    <!-- Game Over Overlay -->
+    <LinearLayout
+        android:id="@+id/gameOverOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:background="#CC000000"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvGameOver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/game_over"
+            android:textColor="@android:color/white"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tvFinalScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/score"
+            android:textColor="@android:color/white"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tvHighScoreFinal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="@string/high_score"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- Home Button -->
+            <ImageButton
+                android:id="@+id/btnHome"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/circle_background"
+                android:src="@android:drawable/ic_menu_revert"
+                android:contentDescription="Home"
+                android:layout_margin="16dp"
+                app:tint="@android:color/white" />
+
+            <!-- Play Again Button -->
+            <ImageButton
+                android:id="@+id/btnPlayAgain"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/circle_background"
+                android:src="@android:drawable/ic_media_play"
+                android:contentDescription="Play Again"
+                android:layout_margin="16dp"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
 </FrameLayout>

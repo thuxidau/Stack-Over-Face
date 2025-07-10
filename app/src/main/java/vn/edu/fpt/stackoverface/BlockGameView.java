@@ -23,7 +23,7 @@ public class BlockGameView extends View {
     private boolean movingRight = true;
     private final List<FallingBlock> fallingBlocks = new ArrayList<>();
     private int score = 0;
-    private final int BLOCK_SPEED = 5;
+    private final int BLOCK_SPEED = 4;
     private final int FRAME_DELAY = 16; // ~60fps
     private static float stackOffsetY = 200; // Initial vertical offset from bottom
     private float stackShiftPerDrop = 30; // How much to move down each time
