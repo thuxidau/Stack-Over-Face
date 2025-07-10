@@ -1,5 +1,8 @@
 package vn.edu.fpt.stackoverface;
 
+import android.support.v4.os.ResultReceiver;
+
+import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.camera.core.ExperimentalGetImage;
@@ -14,8 +17,10 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
 
     private final FaceDetector detector;
     private final Runnable blinkCallback;
-
+    private Runnable faceNotDetectedCallback;
+    private boolean faceWarningShown = false;
     private long lastBlinkTime = 0;
+    public static long lastFaceTime = System.currentTimeMillis();
     private static final long BLINK_COOLDOWN = 300;
     private static final float BLINK_THRESHOLD = 0.2f;
 
@@ -44,24 +49,38 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
         );
 
         detector.process(image)
-                .addOnSuccessListener(faces -> {
-                    if (!faces.isEmpty()) {
-                        Face face = faces.get(0);
-                        Float leftEye = face.getLeftEyeOpenProbability();
-                        Float rightEye = face.getRightEyeOpenProbability();
+            .addOnSuccessListener(faces -> {
+                if (!faces.isEmpty()) {
+                    lastFaceTime = System.currentTimeMillis(); // face found
+                    faceWarningShown = false; // reset flag when face returns
 
-                        if (leftEye != null && rightEye != null &&
-                                leftEye < BLINK_THRESHOLD &&
-                                rightEye < BLINK_THRESHOLD) {
+                    Face face = faces.get(0);
+                    Float leftEye = face.getLeftEyeOpenProbability();
+                    Float rightEye = face.getRightEyeOpenProbability();
 
-                            long now = System.currentTimeMillis();
-                            if (now - lastBlinkTime > BLINK_COOLDOWN) {
-                                lastBlinkTime = now;
-                                blinkCallback.run(); // Call the lambda passed from MainActivity
-                            }
+                    if (leftEye != null && rightEye != null &&
+                            leftEye < BLINK_THRESHOLD &&
+                            rightEye < BLINK_THRESHOLD) {
+
+                        long now = System.currentTimeMillis();
+                        if (now - lastBlinkTime > BLINK_COOLDOWN) {
+                            lastBlinkTime = now;
+                            blinkCallback.run(); // Call the lambda passed from MainActivity
                         }
                     }
-                })
-                .addOnCompleteListener(task -> imageProxy.close());
+                }
+                // face not found
+                else {
+                    if (!faceWarningShown && System.currentTimeMillis() - lastFaceTime > 3000) {
+                        faceWarningShown = true;
+                        faceNotDetectedCallback.run();
+                    }
+                }
+            })
+            .addOnCompleteListener(task -> imageProxy.close());
+    }
+
+    public void setFaceNotDetectedCallback(Runnable callback) {
+        this.faceNotDetectedCallback = callback;
     }
 }

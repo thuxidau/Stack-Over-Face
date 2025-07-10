@@ -1,24 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/gameRoot"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 1. Camera Preview (background) -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/cameraPreview"
+    <!-- Background image instead of camera preview -->
+    <ImageView
+        android:id="@+id/staticBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@color/black"
+        android:contentDescription="@string/static_game_background" />
 
-    <!-- 2. Custom Game View -->
+    <!-- BlockGameView (same as MainActivity) -->
     <vn.edu.fpt.stackoverface.BlockGameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- 3. HUD Overlay -->
+    <!-- Score text -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

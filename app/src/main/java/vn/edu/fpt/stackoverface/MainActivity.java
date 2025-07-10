@@ -1,5 +1,6 @@
 package vn.edu.fpt.stackoverface;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -10,15 +11,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
+        faceAnalyzer.setFaceNotDetectedCallback(() -> runOnUiThread(this::showTryAgainDialog));
+
         gameView.setGameOverCallback(() -> {
             runOnUiThread(() -> {
                 int score = gameView.getScore();
@@ -86,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btnPlayAgain).setOnClickListener(v -> {
             finish(); // closes current MainActivity
-            startActivity(getIntent()); // restarts it
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent); // restarts it
         });
 
         findViewById(R.id.btnHome).setOnClickListener(v -> {
@@ -123,11 +126,77 @@ public class MainActivity extends AppCompatActivity {
                         preview,
                         imageAnalysis
                 );
-
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
             } catch (ExecutionException | InterruptedException e) {
-                Toast.makeText(this, "Camera initialization failed.", Toast.LENGTH_SHORT).show();
-                Log.e("CameraX", "Error binding camera use cases", e);
+                runOnUiThread(this::showNoCameraDialog);
             }
         }, ContextCompat.getMainExecutor(this));
+    }
+
+    private void switchToTapMode() {
+        Intent intent = new Intent(MainActivity.this, TapModeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startCamera();
+            } else {
+                showPermissionDialog();
+            }
+        }
+    }
+
+    private void showTryAgainDialog() {
+        if (isFinishing() || isDestroyed()) return;
+
+        runOnUiThread(() -> {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Face Not Detected")
+                    .setMessage("Face not detected. Try again or switch to Tap Mode?")
+                    .setCancelable(false) // prevent flickering/multiple alerts
+                    .setPositiveButton("Try Again", (d, w) -> {
+                        FaceAnalyzer.lastFaceTime = System.currentTimeMillis(); // reset face detection timeout
+                    })
+                    .setNegativeButton("Switch to Tap Mode", (d, w) -> switchToTapMode())
+                    .show();
+        });
+    }
+
+    private void showPermissionDialog() {
+        if (isFinishing() || isDestroyed()) return;
+
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Camera Permission Needed")
+                    .setMessage("Allow camera access to play with blinks. Or switch to Tap Mode.")
+                    .setCancelable(false)
+                    .setPositiveButton("Switch to Tap Mode", (d, w) -> switchToTapMode())
+                    .setNegativeButton("Close", null)
+                    .show();
+        });
+    }
+
+    private void showNoCameraDialog() {
+        if (isFinishing() || isDestroyed()) return;
+
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed()) return;
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Camera Not Available")
+                    .setMessage("Your device does not support camera. Switch to Tap Mode?")
+                    .setCancelable(false)
+                    .setPositiveButton("Switch", (d, w) -> switchToTapMode())
+                    .setNegativeButton("Exit", (d, w) -> finish())
+                    .show();
+        });
     }
 }

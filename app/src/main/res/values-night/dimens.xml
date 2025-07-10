@@ -3,4 +3,5 @@
     <dimen name="padding">16dp</dimen>
     <dimen name="score_text_size">20sp</dimen>
     <dimen name="game_name_text_size">40sp</dimen>
+    <dimen name="game_over_text_size">36sp</dimen>
 </resources>

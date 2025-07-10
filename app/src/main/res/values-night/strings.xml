@@ -7,4 +7,7 @@
     <string name="settings">Settings</string>
     <string name="instructions">Instructions</string>
     <string name="game_over">Game Over</string>
+    <string name="home">Home</string>
+    <string name="play_again">Play Again</string>
+    <string name="static_game_background">Static game background</string>
 </resources>
