@@ -21,6 +21,7 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
     private final Runnable blinkCallback;
     private Runnable faceNotDetectedCallback;
     public static boolean faceWarningShown = false;
+    private boolean active = true;
     private long lastBlinkTime = 0;
     public static long lastFaceTime = System.currentTimeMillis();
     private static final long BLINK_COOLDOWN = 300;
@@ -46,6 +47,11 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
             return;
         }
 
+        if (!active) {
+            imageProxy.close();
+            return;
+        }
+
         InputImage image = InputImage.fromMediaImage(
                 imageProxy.getImage(),
                 imageProxy.getImageInfo().getRotationDegrees()
@@ -66,14 +72,13 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
                     Float leftEye = face.getLeftEyeOpenProbability();
                     Float rightEye = face.getRightEyeOpenProbability();
 
-                    if (leftEye != null && rightEye != null &&
+                    if (blinkCallback != null && leftEye != null && rightEye != null &&
                             leftEye < BLINK_THRESHOLD &&
                             rightEye < BLINK_THRESHOLD) {
 
-                        long now = System.currentTimeMillis();
-                        if (now - lastBlinkTime > BLINK_COOLDOWN) {
-                            lastBlinkTime = now;
-                            blinkCallback.run(); // Call the lambda passed from MainActivity
+                        if (System.currentTimeMillis() - lastBlinkTime > BLINK_COOLDOWN) {
+                            lastBlinkTime = System.currentTimeMillis();
+                            if (active) blinkCallback.run();
                         }
                     }
                 }
@@ -91,5 +96,9 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
 
     public void setFaceNotDetectedCallback(Runnable callback) {
         this.faceNotDetectedCallback = callback;
+    }
+
+    public void stop() {
+        active = false;
     }
 }

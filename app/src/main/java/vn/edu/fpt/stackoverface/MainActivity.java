@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         gameView.setGameOverCallback(() -> {
             runOnUiThread(() -> {
+                gameView.setGameOver(true); // stop updates and input
+                faceAnalyzer.stop();
+
                 int score = gameView.getScore();
 
                 // Save high score

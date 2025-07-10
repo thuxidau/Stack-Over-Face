@@ -29,6 +29,11 @@ public class BlockGameView extends View {
     private float stackShiftPerDrop = 30; // How much to move down each time
     private Handler handler = new Handler();
     private Runnable gameOverCallback;
+    private boolean isGameOver = false;
+
+    public void setGameOver(boolean over) {
+        isGameOver = over;
+    }
 
     public BlockGameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -70,6 +75,8 @@ public class BlockGameView extends View {
     }
 
     private void moveBlock() {
+        if (isGameOver || currentBlock == null) return;
+
         float halfWidth = currentBlock.width / 2f;
 
         if (movingRight) {
@@ -235,7 +242,8 @@ public class BlockGameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // TEMP: for tap-to-drop testing
+        if (isGameOver) return false;
+
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             dropBlock();
             return true;
