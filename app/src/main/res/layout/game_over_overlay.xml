@@ -56,22 +56,26 @@
                 android:id="@+id/btnHome"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:background="@drawable/circle_background"
-                android:src="@android:drawable/ic_menu_revert"
-                android:contentDescription="@string/home"
                 android:layout_margin="16dp"
-                app:tint="@android:color/white" />
+                android:background="@drawable/circle_background"
+                android:contentDescription="@string/home"
+                android:padding="@dimen/padding"
+                android:scaleType="centerInside"
+                android:src="@drawable/home"
+                app:tint="@null" />
 
             <!-- Play Again Button -->
             <ImageButton
                 android:id="@+id/btnPlayAgain"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:background="@drawable/circle_background"
-                android:src="@android:drawable/ic_media_play"
-                android:contentDescription="@string/play_again"
                 android:layout_margin="16dp"
-                app:tint="@android:color/white" />
+                android:background="@drawable/circle_background"
+                android:contentDescription="@string/play_again"
+                android:padding="@dimen/padding"
+                android:scaleType="centerInside"
+                android:src="@drawable/play_again"
+                app:tint="@null" />
         </LinearLayout>
     </LinearLayout>
 

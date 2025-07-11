@@ -74,7 +74,8 @@
         android:layout_gravity="end|bottom"
         android:background="@android:color/transparent"
         android:contentDescription="@string/instructions"
-        android:src="@android:drawable/ic_menu_info_details"
-        app:tint="@color/black" />
+        android:src="@drawable/info"
+        android:scaleType="centerInside"
+        app:tint="@null"/>
 
 </GridLayout>

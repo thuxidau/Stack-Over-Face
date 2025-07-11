@@ -41,8 +41,7 @@ public class StartActivity extends MusicBoundActivity {
         // Update the TextView
         tvHighScore.setText(getString(R.string.high_score, best));
 
-        ImageButton btnBlinkPlay = findViewById(R.id.btnBlinkPlay);
-        btnBlinkPlay.setOnClickListener(v -> {
+        findViewById(R.id.btnBlinkPlay).setOnClickListener(v -> {
             Intent intent = new Intent(StartActivity.this, MainActivity.class); // <- this should be your gameplay activity
             startActivity(intent);
         });
