@@ -4,9 +4,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 public abstract class MusicBoundActivity extends AppCompatActivity {
 
@@ -19,7 +21,11 @@ public abstract class MusicBoundActivity extends AppCompatActivity {
             MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             musicService = binder.getService();
             isBound = true;
-            musicService.resumeMusic(); // resume immediately when connected
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MusicBoundActivity.this);
+            if (prefs.getBoolean("music_enabled", true)) {
+                musicService.resumeMusic(); // only resume if user wants music
+            }
         }
 
         @Override
@@ -39,7 +45,10 @@ public abstract class MusicBoundActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (musicService != null) {
-            musicService.resumeMusic();
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            if (prefs.getBoolean("music_enabled", true)) {
+                musicService.resumeMusic(); // only when setting is true
+            }
         }
     }
 
@@ -47,7 +56,6 @@ public abstract class MusicBoundActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (isBound && musicService != null) {
-//            musicService.pauseMusic();
             unbindService(serviceConnection);
             isBound = false;
         }

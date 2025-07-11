@@ -29,5 +29,9 @@ public class StartActivity extends MusicBoundActivity {
             Intent intent = new Intent(StartActivity.this, MainActivity.class); // <- this should be your gameplay activity
             startActivity(intent);
         });
+
+        findViewById(R.id.btnSettings).setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class));
+        });
     }
 }

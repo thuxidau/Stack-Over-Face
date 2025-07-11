@@ -1,6 +1,7 @@
 package vn.edu.fpt.stackoverface;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +11,8 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -156,7 +159,10 @@ public class BlockGameView extends View {
         currentBlock.y = last.y - blockHeight;
         stackBlocks.add(currentBlock);
 
-        if (dropSoundPlayer != null) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean soundEnabled = prefs.getBoolean("sound_enabled", true);
+
+        if (soundEnabled && dropSoundPlayer != null) {
             dropSoundPlayer.start();
         }
 

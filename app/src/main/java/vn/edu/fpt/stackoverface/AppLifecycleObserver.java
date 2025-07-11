@@ -3,11 +3,11 @@ package vn.edu.fpt.stackoverface;
 import android.content.Context;
 import android.content.Intent;
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
-public class AppLifecycleObserver implements LifecycleObserver {
+public class AppLifecycleObserver implements DefaultLifecycleObserver {
 
     private final Context context;
 
@@ -15,19 +15,17 @@ public class AppLifecycleObserver implements LifecycleObserver {
         this.context = context.getApplicationContext();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    public void onAppBackgrounded() {
-        // App goes to background
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
         Intent intent = new Intent(context, MusicService.class);
-        intent.setAction("PAUSE");
+        intent.setAction("RESUME");
         context.startService(intent);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    public void onAppForegrounded() {
-        // App comes to foreground
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
         Intent intent = new Intent(context, MusicService.class);
-        intent.setAction("RESUME");
+        intent.setAction("PAUSE");
         context.startService(intent);
     }
 }

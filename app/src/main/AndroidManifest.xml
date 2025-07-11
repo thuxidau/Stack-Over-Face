@@ -36,6 +36,10 @@
             android:name=".TapModeActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true" />
+
         <service
             android:name=".MusicService"
             android:exported="false" />

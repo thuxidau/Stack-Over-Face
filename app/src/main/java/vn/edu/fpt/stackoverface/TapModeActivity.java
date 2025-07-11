@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.preference.PreferenceManager;
+
 public class TapModeActivity extends MusicBoundActivity {
 
     private BlockGameView gameView;
@@ -35,8 +37,12 @@ public class TapModeActivity extends MusicBoundActivity {
 
         gameView.setGameOverCallback(() -> {
             runOnUiThread(() -> {
-                MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
-                gameOverPlayer.start();
+                // game over sound
+                SharedPreferences prefs_sound = PreferenceManager.getDefaultSharedPreferences(this);
+                if (prefs_sound.getBoolean("sound_enabled", true)) {
+                    MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
+                    gameOverPlayer.start();
+                }
 
                 int score = gameView.getScore();
 

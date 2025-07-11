@@ -43,6 +43,7 @@ dependencies {
     implementation("com.google.mlkit:face-detection:16.1.7")
 
     implementation("androidx.lifecycle:lifecycle-process:2.9.1")
+    implementation("androidx.preference:preference:1.2.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

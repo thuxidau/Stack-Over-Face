@@ -8,6 +8,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -55,8 +56,8 @@ public class MainActivity extends MusicBoundActivity {
 
         faceAnalyzer = new FaceAnalyzer(this, () -> {
             gameView.post(() -> {
-                gameView.dropBlock();
                 gameView.setContext(this); // Pass context for sound setup
+                gameView.dropBlock();
                 tvScore.setText(getString(R.string.score, gameView.getScore()));
             });
         });
@@ -68,8 +69,12 @@ public class MainActivity extends MusicBoundActivity {
                 gameView.setGameOver(true); // stop updates and input
                 faceAnalyzer.stop();
 
-                MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
-                gameOverPlayer.start();
+                // game over sound
+                SharedPreferences prefs_sound = PreferenceManager.getDefaultSharedPreferences(this);
+                if (prefs_sound.getBoolean("sound_enabled", true)) {
+                    MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
+                    gameOverPlayer.start();
+                }
 
                 int score = gameView.getScore();
 
