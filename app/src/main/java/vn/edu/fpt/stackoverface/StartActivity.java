@@ -47,7 +47,9 @@ public class StartActivity extends MusicBoundActivity {
         });
 
         findViewById(R.id.btnSettings).setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
+            getSupportFragmentManager().beginTransaction()
+                    .add(android.R.id.content, new SettingsOverlayFragment())
+                    .commit();
         });
 
         findViewById(R.id.btnInstructions).setOnClickListener(v -> {

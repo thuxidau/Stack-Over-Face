@@ -10,4 +10,6 @@
     <string name="home">Home</string>
     <string name="play_again">Play Again</string>
     <string name="static_game_background">Static game background</string>
+    <string name="background_music">Background Music</string>
+    <string name="sound_effects">Sound Effects</string>
 </resources>
