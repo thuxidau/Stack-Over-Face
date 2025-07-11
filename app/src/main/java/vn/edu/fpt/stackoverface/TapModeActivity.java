@@ -44,6 +44,7 @@ public class TapModeActivity extends MusicBoundActivity {
                     gameOverPlayer.start();
                 }
 
+                gameView.setGameOver(true); // stop updates and input
                 int score = gameView.getScore();
 
                 SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
