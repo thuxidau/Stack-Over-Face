@@ -3,7 +3,7 @@
     android:id="@+id/gridLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@drawable/bg_image_start_screen"
     android:columnCount="2"
     android:padding="16dp"
     android:rowCount="6">
@@ -16,9 +16,9 @@
         android:layout_row="1"
         android:layout_columnSpan="2"
         android:layout_gravity="center"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="80dp"
         android:text="@string/app_name"
-        android:textColor="@android:color/white"
+        android:textColor="@color/black"
         android:textSize="@dimen/game_name_text_size"
         android:textStyle="bold" />
 
@@ -31,19 +31,24 @@
         android:layout_columnSpan="2"
         android:layout_gravity="center"
         android:text="@string/high_score"
-        android:textColor="@android:color/white"
+        android:textColor="@color/black"
         android:textSize="@dimen/score_text_size" />
 
     <!-- Blink to Play Button -->
-    <Button
+    <ImageButton
         android:id="@+id/btnBlinkPlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_row="4"
         android:layout_columnSpan="2"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:text="@string/blink_to_play" />
+        android:layout_marginTop="200dp"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="#80FFFFFF"
+        android:contentDescription="@string/blink_to_play"
+        android:scaleType="centerInside"
+        android:src="@android:drawable/ic_media_play"
+        app:tint="#FFFFFF" />
 
     <!-- Settings Button (Top-right) -->
     <ImageButton
@@ -54,9 +59,10 @@
         android:layout_column="1"
         android:layout_gravity="end"
         android:background="@android:color/transparent"
+        android:src="@drawable/settings"
         android:contentDescription="@string/settings"
-        android:src="@android:drawable/ic_menu_preferences"
-        app:tint="@android:color/white" />
+        android:scaleType="centerInside"
+        app:tint="@null" />
 
     <!-- Instructions Button (Bottom-right) -->
     <ImageButton
@@ -69,6 +75,6 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/instructions"
         android:src="@android:drawable/ic_menu_info_details"
-        app:tint="@android:color/white" />
+        app:tint="@color/black" />
 
 </GridLayout>
