@@ -73,12 +73,15 @@ public class BlockGameView extends View {
             float centerX = getWidth() / 2f;
             float baseY = getHeight() - blockHeight - stackOffsetY - 100; // raised above bottom
 
-            Block baseBlock = new Block(centerX, baseY, blockWidth, blockHeight, Color.RED);
+            float[] hsv = new float[3];
+            Color.colorToHSV(Color.parseColor("#D84137"), hsv);
+
+            Block baseBlock = new Block(centerX, baseY, blockWidth, blockHeight, Color.HSVToColor(new float[]{3.5f, 0.74f, 0.85f}));
             stackBlocks.add(baseBlock);
             stackOffsetY -= 400;
 
             float startY = baseY - blockHeight;
-            int nextColor = generateNextColor(Color.RED);
+            int nextColor = generateNextColor(Color.HSVToColor(new float[]{3.5f, 0.74f, 0.85f}));
             currentBlock = new Block(centerX, startY, blockWidth, blockHeight, nextColor);
 
             startMoving();
@@ -188,10 +191,12 @@ public class BlockGameView extends View {
     }
 
     private int generateNextColor(int previousColor) {
-        // Change HUE gradually, wrap from red (0) to blue (240)
-        float[] hsv = new float[]{0f, 1f, 1f}; // default red
-        Color.colorToHSV(previousColor, hsv);
-        hsv[0] = (hsv[0] + 30f) % 360f; // increment hue
+        float[] hsv = new float[]{0f, 0.5f, 0.75f}; // softer saturation, brighter value
+
+        if (previousColor != 0) {
+            Color.colorToHSV(previousColor, hsv);
+            hsv[0] = (hsv[0] + 30f) % 360f; // rotate hue
+        }
 
         return Color.HSVToColor(hsv);
     }

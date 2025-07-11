@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class StartActivity extends MusicBoundActivity {
@@ -41,7 +41,7 @@ public class StartActivity extends MusicBoundActivity {
         // Update the TextView
         tvHighScore.setText(getString(R.string.high_score, best));
 
-        Button btnBlinkPlay = findViewById(R.id.btnBlinkPlay);
+        ImageButton btnBlinkPlay = findViewById(R.id.btnBlinkPlay);
         btnBlinkPlay.setOnClickListener(v -> {
             Intent intent = new Intent(StartActivity.this, MainActivity.class); // <- this should be your gameplay activity
             startActivity(intent);
