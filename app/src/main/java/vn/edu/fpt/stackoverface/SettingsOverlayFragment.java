@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,11 +34,11 @@ public class SettingsOverlayFragment extends Fragment {
         switchMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("music_enabled", isChecked).apply();
 
-            // Immediately apply
             Intent intent = new Intent(requireContext(), MusicService.class);
-            intent.setAction("STOP_IF_DISABLED");
+            intent.setAction(isChecked ? "RESUME" : "STOP_IF_DISABLED");
             requireContext().startService(intent);
         });
+
 
         switchSound.setOnCheckedChangeListener((buttonView, isChecked) ->
                 prefs.edit().putBoolean("sound_enabled", isChecked).apply()
@@ -51,7 +50,7 @@ public class SettingsOverlayFragment extends Fragment {
 
         // Dismiss if user taps outside settings panel
         FrameLayout root = view.findViewById(R.id.settingsOverlay);
-        LinearLayout panel = view.findViewById(R.id.settingsPanel);
+//        LinearLayout panel = view.findViewById(R.id.settingsPanel);
         root.setOnClickListener(v -> {
             if (v == root) {
                 requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
