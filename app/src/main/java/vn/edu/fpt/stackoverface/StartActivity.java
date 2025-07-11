@@ -6,17 +6,14 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends MusicBoundActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        Intent musicIntent = new Intent(this, MusicService.class);
-        startService(musicIntent);
+        startService(new Intent(this, MusicService.class));
 
         TextView tvHighScore = findViewById(R.id.tvHighScore);
 
@@ -32,17 +29,5 @@ public class StartActivity extends AppCompatActivity {
             Intent intent = new Intent(StartActivity.this, MainActivity.class); // <- this should be your gameplay activity
             startActivity(intent);
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopService(new Intent(this, MusicService.class));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopService(new Intent(this, MusicService.class));
     }
 }

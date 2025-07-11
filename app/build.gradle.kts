@@ -42,6 +42,8 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("com.google.mlkit:face-detection:16.1.7")
 
+    implementation("androidx.lifecycle:lifecycle-process:2.9.1")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
