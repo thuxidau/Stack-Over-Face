@@ -4,26 +4,12 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class StartActivity extends MusicBoundActivity {
 
-    private String instructions = "HOW TO PLAY:\n\n" +
-            "🧠 Two Modes Available:\n" +
-            "• Blink Mode: Blink your eyes to drop blocks.\n" +
-            "• Tap Mode: (If your face is not detected) Tap the screen to drop blocks.\n\n" +
-            "🎯 Your Goal:\n" +
-            "• Drop each moving block onto the stack below.\n" +
-            "• The more accurately you stack, the higher your tower grows.\n\n" +
-            "⚠️ Missed the Stack?\n" +
-            "• If your block completely misses the one below... it's GAME OVER!\n\n" +
-            "🧩 Bonus Tips:\n" +
-            "• Only the overlapping part of the block remains.\n" +
-            "• The rest will fall off as debris.\n" +
-            "• Alternate directions every drop for extra challenge.\n\n" +
-            "🔊 Use Settings:\n" +
-            "• Turn sound or music on/off anytime via the settings button.";
+    private final String instructions = "• Blink your eyes to drop blocks.\n" +
+            "• (If your face is not detected) Tap the screen to drop blocks.";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +32,14 @@ public class StartActivity extends MusicBoundActivity {
             startActivity(intent);
         });
 
-        findViewById(R.id.btnSettings).setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .add(android.R.id.content, new SettingsOverlayFragment())
-                    .commit();
-        });
+        findViewById(R.id.btnSettings).setOnClickListener(v -> getSupportFragmentManager().beginTransaction()
+                .add(android.R.id.content, new SettingsOverlayFragment())
+                .commit());
 
-        findViewById(R.id.btnInstructions).setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Game Instructions")
-                    .setMessage(instructions)
-                    .setPositiveButton("Got it!", null)
-                    .show();
-        });
+        findViewById(R.id.btnInstructions).setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("Game Instructions")
+                .setMessage(instructions)
+                .setPositiveButton("Got it!", null)
+                .show());
     }
 }
