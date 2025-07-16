@@ -23,55 +23,56 @@ public class TapModeActivity extends MusicBoundActivity {
         gameView = findViewById(R.id.gameView);
         tvScore = findViewById(R.id.tvScore);
 
+        // Enable tap mode and set initial score
         gameView.post(() -> {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
-            gameView.setTapEnabled(true);
+            gameView.setTapEnabled(true); // Enable tap-based control so users can tap to drop blocks
             gameView.setContext(this); // Pass context for sound setup
         });
 
-        gameView.setScoreUpdateCallback(() -> {
-            runOnUiThread(() -> {
-                tvScore.setText(getString(R.string.score, gameView.getScore()));
-            });
-        });
+        // Update the on-screen score when it changes during gameplay
+        gameView.setScoreUpdateCallback(() -> runOnUiThread(() ->
+                tvScore.setText(getString(R.string.score, gameView.getScore()))));
 
-        gameView.setGameOverCallback(() -> {
-            runOnUiThread(() -> {
-                // game over sound
-                SharedPreferences prefs_sound = PreferenceManager.getDefaultSharedPreferences(this);
-                if (prefs_sound.getBoolean("sound_enabled", true)) {
-                    MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
-                    gameOverPlayer.start();
-                }
+        // Game over callback
+        gameView.setGameOverCallback(() -> runOnUiThread(() -> {
+            // game over sound
+            SharedPreferences prefs_sound = PreferenceManager.getDefaultSharedPreferences(this);
+            if (prefs_sound.getBoolean("sound_enabled", true)) {
+                MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
+                gameOverPlayer.start();
+            }
 
-                gameView.setGameOver(true); // stop updates and input
-                int score = gameView.getScore();
+            gameView.setGameOver(true); // stop updates and input
 
-                SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
-                int best = prefs.getInt("best_score", 0);
-                if (score > best) {
-                    prefs.edit().putInt("best_score", score).apply();
-                    best = score;
-                }
+            // Show current and high score
+            int score = gameView.getScore();
+            SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+            int best = prefs.getInt("best_score", 0);
+            if (score > best) {
+                prefs.edit().putInt("best_score", score).apply();
+                best = score;
+            }
 
-                tvScore.setVisibility(View.GONE);
+            tvScore.setVisibility(View.GONE);
 
-                TextView tvFinalScore = findViewById(R.id.tvFinalScore);
-                TextView tvHighScoreFinal = findViewById(R.id.tvHighScoreFinal);
-                LinearLayout gameOverOverlay = findViewById(R.id.gameOverOverlay);
+            TextView tvFinalScore = findViewById(R.id.tvFinalScore);
+            TextView tvHighScoreFinal = findViewById(R.id.tvHighScoreFinal);
+            LinearLayout gameOverOverlay = findViewById(R.id.gameOverOverlay);
 
-                tvFinalScore.setText(getString(R.string.score, score));
-                tvHighScoreFinal.setText(getString(R.string.high_score, best));
+            tvFinalScore.setText(getString(R.string.score, score));
+            tvHighScoreFinal.setText(getString(R.string.high_score, best));
 
-                gameOverOverlay.setVisibility(View.VISIBLE);
-            });
-        });
+            gameOverOverlay.setVisibility(View.VISIBLE); // Show game over overlay
+        }));
 
+        // Show play again button
         findViewById(R.id.btnPlayAgain).setOnClickListener(v -> {
             finish();
             startActivity(new Intent(this, TapModeActivity.class));
         });
 
+        // Show home button
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             Intent intent = new Intent(this, StartActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

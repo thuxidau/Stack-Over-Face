@@ -41,71 +41,76 @@ public class MainActivity extends MusicBoundActivity {
         gameView = findViewById(R.id.gameView);
         TextView tvScore = findViewById(R.id.tvScore);
 
+        // Request camera permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
+            // Not granted
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
         } else {
+            // Granted
             startCamera();
         }
 
-        // Set initial score (0) after layout is ready
+        // Initialize game
         gameView.post(() -> {
+            tvScore.setText(getString(R.string.score, gameView.getScore())); // Set the initial score
+            gameView.setTapEnabled(false); // Disable taps — game starts with blink input, not touch
+        });
+
+        // Set up face analyzer
+        faceAnalyzer = new FaceAnalyzer(this, () -> gameView.post(() -> {
+            gameView.setContext(this); // Pass context for sound setup
+            gameView.dropBlock();
             tvScore.setText(getString(R.string.score, gameView.getScore()));
-            gameView.setTapEnabled(false);
-        });
+        }));
 
-        faceAnalyzer = new FaceAnalyzer(this, () -> {
-            gameView.post(() -> {
-                gameView.setContext(this); // Pass context for sound setup
-                gameView.dropBlock();
-                tvScore.setText(getString(R.string.score, gameView.getScore()));
-            });
-        });
-
+        // Show alert when no face is found for 3 seconds
         faceAnalyzer.setFaceNotDetectedCallback(() -> runOnUiThread(this::showTryAgainDialog));
 
-        gameView.setGameOverCallback(() -> {
-            runOnUiThread(() -> {
-                gameView.setGameOver(true); // stop updates and input
-                faceAnalyzer.stop();
+        // Game over callback
+        gameView.setGameOverCallback(() -> runOnUiThread(() -> {
+            gameView.setGameOver(true); // Stop updates and input
+            faceAnalyzer.stop(); // Stop face detection
 
-                // game over sound
-                SharedPreferences prefs_sound = PreferenceManager.getDefaultSharedPreferences(this);
-                if (prefs_sound.getBoolean("sound_enabled", true)) {
-                    MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
-                    gameOverPlayer.start();
-                }
+            // Play game over sound
+            SharedPreferences prefs_sound = PreferenceManager.getDefaultSharedPreferences(this);
+            if (prefs_sound.getBoolean("sound_enabled", true)) {
+                MediaPlayer gameOverPlayer = MediaPlayer.create(this, R.raw.game_over);
+                gameOverPlayer.start();
+            }
 
-                int score = gameView.getScore();
+            // Save high score
+            int score = gameView.getScore();
+            SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+            int best = prefs.getInt("best_score", 0);
+            if (score > best) {
+                prefs.edit().putInt("best_score", score).apply();
+                best = score;
+            }
 
-                // Save high score
-                SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
-                int best = prefs.getInt("best_score", 0);
-                if (score > best) {
-                    prefs.edit().putInt("best_score", score).apply();
-                    best = score;
-                }
+            // Update overlay UI
+            tvScore.setVisibility(View.GONE); // hide in-game score
 
-                // Update overlay UI
-                tvScore.setVisibility(View.GONE); // hide in-game score
+            TextView tvFinalScore = findViewById(R.id.tvFinalScore);
+            TextView tvHighScoreFinal = findViewById(R.id.tvHighScoreFinal);
+            LinearLayout gameOverOverlay = findViewById(R.id.gameOverOverlay);
 
-                TextView tvFinalScore = findViewById(R.id.tvFinalScore);
-                TextView tvHighScoreFinal = findViewById(R.id.tvHighScoreFinal);
-                LinearLayout gameOverOverlay = findViewById(R.id.gameOverOverlay);
+            // Set current and high score
+            tvFinalScore.setText(getString(R.string.score, score));
+            tvHighScoreFinal.setText(getString(R.string.high_score, best));
 
-                tvFinalScore.setText(getString(R.string.score, score));
-                tvHighScoreFinal.setText(getString(R.string.high_score, best));
+            // Show game over overlay
+            gameOverOverlay.setVisibility(View.VISIBLE);
+        }));
 
-                gameOverOverlay.setVisibility(View.VISIBLE);
-            });
-        });
-
+        // Restart the activity
         findViewById(R.id.btnPlayAgain).setOnClickListener(v -> {
             finish(); // closes current MainActivity
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent); // restarts it
         });
 
+        // Navigate to StartActivity
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             Intent intent = new Intent(this, StartActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -115,33 +120,36 @@ public class MainActivity extends MusicBoundActivity {
     }
 
     private void startCamera() {
+        // Get camera provider
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
                 ProcessCameraProvider.getInstance(this);
 
+        // Set up the camera once ready
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
 
+                // Set up camera preview
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
-                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                // Set up image analysis (face detection)
+                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder() // Give access to the raw camera frames
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // Only get the latest frame, avoid lag
                         .build();
 
+                // Process each frame on the main thread
                 imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), faceAnalyzer);
 
+                // Choose the front camera (selfie camera)
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA;
 
-                cameraProvider.unbindAll();
-                cameraProvider.bindToLifecycle(
-                        this,
-                        cameraSelector,
-                        preview,
-                        imageAnalysis
-                );
+                cameraProvider.unbindAll(); // Unbind any previous use of the camera
+                // Bind this camera + preview + analysis to the activity lifecycle (starts and stops automatically)
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
-            } catch (ExecutionException | InterruptedException e) {
+            }
+            // If failed, show alert
+            catch (ExecutionException | InterruptedException e) {
                 runOnUiThread(this::showNoCameraDialog);
             }
         }, ContextCompat.getMainExecutor(this));
@@ -149,11 +157,12 @@ public class MainActivity extends MusicBoundActivity {
 
     private void switchToTapMode() {
         Intent intent = new Intent(MainActivity.this, TapModeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clears the activity stack so the user can’t go "back" to the camera mode
         startActivity(intent);
         finish();
     }
 
+    // Handle the result of the camera permission request
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -167,9 +176,11 @@ public class MainActivity extends MusicBoundActivity {
     }
 
     private void showTryAgainDialog() {
+        // Make sure the activity is still alive before showing a dialog
         if (isFinishing() || isDestroyed()) return;
 
         runOnUiThread(() -> {
+            // If face is detected, the alert will disappear
             if (faceAlertDialog != null && faceAlertDialog.isShowing()) return;
 
             faceAlertDialog = new AlertDialog.Builder(MainActivity.this)
@@ -177,20 +188,23 @@ public class MainActivity extends MusicBoundActivity {
                     .setMessage("Face not detected. Try again or switch to Tap Mode?")
                     .setCancelable(false)
                     .setPositiveButton("Try Again", (d, w) -> {
+                        // Reset the face detection timer so the warning can reappear later if needed
                         FaceAnalyzer.lastFaceTime = System.currentTimeMillis();
                         FaceAnalyzer.faceWarningShown = false; // allow warning to show again if still no face
                         faceAlertDialog = null;
                     })
                     .setNegativeButton("Switch to Tap Mode", (d, w) -> {
+                        // Transition to tap mode
                         switchToTapMode();
                         faceAlertDialog = null;
                     })
-                    .setOnDismissListener(dialog -> faceAlertDialog = null)
+                    .setOnDismissListener(dialog -> faceAlertDialog = null) // only one dialog shows at a time
                     .show();
         });
     }
 
     private void showPermissionDialog() {
+        // Make sure the activity is still alive before showing a dialog
         if (isFinishing() || isDestroyed()) return;
 
         runOnUiThread(() -> {
@@ -207,6 +221,7 @@ public class MainActivity extends MusicBoundActivity {
     }
 
     private void showNoCameraDialog() {
+        // Make sure the activity is still alive before showing a dialog
         if (isFinishing() || isDestroyed()) return;
 
         runOnUiThread(() -> {
@@ -222,6 +237,7 @@ public class MainActivity extends MusicBoundActivity {
         });
     }
 
+    // Dismiss the "Face Not Detected" alert if it's currently detected
     public void dismissFaceAlert() {
         runOnUiThread(() -> {
             if (faceAlertDialog != null && faceAlertDialog.isShowing()) {

@@ -26,11 +26,13 @@ public class SettingsOverlayFragment extends Fragment {
         MaterialSwitch switchSound = view.findViewById(R.id.switchSound);
         Button btnClose = view.findViewById(R.id.btnCloseSettings);
 
+        // Sync initial states with preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
 
         switchMusic.setChecked(prefs.getBoolean("music_enabled", true));
         switchSound.setChecked(prefs.getBoolean("sound_enabled", true));
 
+        // Music switch listener
         switchMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("music_enabled", isChecked).apply();
 
@@ -39,18 +41,18 @@ public class SettingsOverlayFragment extends Fragment {
             requireContext().startService(intent);
         });
 
-
+        // Sound switch listener
         switchSound.setOnCheckedChangeListener((buttonView, isChecked) ->
                 prefs.edit().putBoolean("sound_enabled", isChecked).apply()
         );
 
+        // Close button handler
         btnClose.setOnClickListener(v ->
                 requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit()
         );
 
         // Dismiss if user taps outside settings panel
         FrameLayout root = view.findViewById(R.id.settingsOverlay);
-//        LinearLayout panel = view.findViewById(R.id.settingsPanel);
         root.setOnClickListener(v -> {
             if (v == root) {
                 requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
