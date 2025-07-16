@@ -96,7 +96,7 @@ public class MainActivity extends MusicBoundActivity {
             LinearLayout gameOverOverlay = findViewById(R.id.gameOverOverlay);
 
             // Set current and high score
-            tvFinalScore.setText(getString(R.string.score, score));
+            tvFinalScore.setText(getString(R.string.final_score, score));
             tvHighScoreFinal.setText(getString(R.string.high_score, best));
 
             // Show game over overlay

@@ -18,30 +18,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- 3. HUD Overlay -->
-    <LinearLayout
+    <!-- Score Display -->
+    <TextView
+        android:id="@+id/tvScore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="@dimen/padding">
-
-        <!-- Score Display -->
-        <TextView
-            android:id="@+id/tvScore"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="#000000"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="3"
-            android:text="@string/score"
-            android:textColor="#FFFFFF"
-            android:textSize="@dimen/score_text_size" />
-
-    </LinearLayout>
+        android:layout_marginTop="100dp"
+        android:shadowColor="#000000"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="3"
+        android:text="@string/score"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/score_text_size" />
 
     <!-- Game Over Overlay-->
     <include layout="@layout/game_over_overlay" />

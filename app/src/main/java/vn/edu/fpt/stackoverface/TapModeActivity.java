@@ -60,7 +60,7 @@ public class TapModeActivity extends MusicBoundActivity {
             TextView tvHighScoreFinal = findViewById(R.id.tvHighScoreFinal);
             LinearLayout gameOverOverlay = findViewById(R.id.gameOverOverlay);
 
-            tvFinalScore.setText(getString(R.string.score, score));
+            tvFinalScore.setText(getString(R.string.final_score, score));
             tvHighScoreFinal.setText(getString(R.string.high_score, best));
 
             gameOverOverlay.setVisibility(View.VISIBLE); // Show game over overlay
