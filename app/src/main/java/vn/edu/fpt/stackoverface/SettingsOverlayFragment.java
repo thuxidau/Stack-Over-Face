@@ -24,6 +24,7 @@ public class SettingsOverlayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         MaterialSwitch switchMusic = view.findViewById(R.id.switchMusic);
         MaterialSwitch switchSound = view.findViewById(R.id.switchSound);
+        MaterialSwitch switchVibration = view.findViewById(R.id.switchVibration);
         Button btnClose = view.findViewById(R.id.btnCloseSettings);
 
         // Sync initial states with preferences
@@ -31,6 +32,7 @@ public class SettingsOverlayFragment extends Fragment {
 
         switchMusic.setChecked(prefs.getBoolean("music_enabled", true));
         switchSound.setChecked(prefs.getBoolean("sound_enabled", true));
+        switchVibration.setChecked(prefs.getBoolean("vibration_enabled", true));
 
         // Music switch listener
         switchMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -45,6 +47,11 @@ public class SettingsOverlayFragment extends Fragment {
         switchSound.setOnCheckedChangeListener((buttonView, isChecked) ->
                 prefs.edit().putBoolean("sound_enabled", isChecked).apply()
         );
+
+        // Vibration switch listener
+        switchVibration.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean("vibration_enabled", isChecked).apply();
+        });
 
         // Close button handler
         btnClose.setOnClickListener(v ->

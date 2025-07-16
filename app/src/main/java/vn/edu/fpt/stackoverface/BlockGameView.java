@@ -8,6 +8,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -184,8 +186,17 @@ public class BlockGameView extends View {
         currentBlock.y = last.y - blockHeight;
         stackBlocks.add(currentBlock);
 
-        // Play a drop sound if the user has sound enabled
+        // Add vibration when the block is dropped
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean vibrationEnabled = prefs.getBoolean("vibration_enabled", true);
+        if (vibrationEnabled) {
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null && vibrator.hasVibrator()) {
+                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+        }
+
+        // Play a drop sound if the user has sound enabled
         boolean soundEnabled = prefs.getBoolean("sound_enabled", true);
         if (soundEnabled && dropSoundPlayer != null) {
             dropSoundPlayer.start();
