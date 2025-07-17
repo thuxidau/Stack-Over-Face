@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +25,10 @@ public class TapModeActivity extends MusicBoundActivity {
         gameView = findViewById(R.id.gameView);
         tvScore = findViewById(R.id.tvScore);
 
+        ImageButton btnPause = findViewById(R.id.btnPause);
+        TextView tvCountdown = findViewById(R.id.tvCountdown);
+        final boolean[] isPaused = {false};
+
         // Enable tap mode and set initial score
         gameView.post(() -> {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
@@ -33,6 +39,39 @@ public class TapModeActivity extends MusicBoundActivity {
         // Update the on-screen score when it changes during gameplay
         gameView.setScoreUpdateCallback(() -> runOnUiThread(() ->
                 tvScore.setText(getString(R.string.score, gameView.getScore()))));
+
+        // Pause listener
+        btnPause.setOnClickListener(v -> {
+            if (!isPaused[0]) {
+                // Pause
+                isPaused[0] = true;
+                gameView.pauseGame();
+                btnPause.setImageResource(R.drawable.ic_play);
+            } else {
+                // Resume with countdown
+                btnPause.setVisibility(View.GONE);
+                tvCountdown.setVisibility(View.VISIBLE);
+                new CountDownTimer(3000, 1000) {
+                    int count = 3;
+
+                    // Countdown
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        tvCountdown.setText(String.valueOf(count--));
+                    }
+
+                    // After finishing countdown
+                    @Override
+                    public void onFinish() {
+                        isPaused[0] = false;
+                        gameView.resumeGame();
+                        btnPause.setImageResource(R.drawable.ic_pause);
+                        btnPause.setVisibility(View.VISIBLE);
+                        tvCountdown.setVisibility(View.GONE);
+                    }
+                }.start();
+            }
+        });
 
         // Game over callback
         gameView.setGameOverCallback(() -> runOnUiThread(() -> {

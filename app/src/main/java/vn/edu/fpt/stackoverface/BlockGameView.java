@@ -39,6 +39,7 @@ public class BlockGameView extends View {
     private Runnable scoreUpdateCallback; // Runnable to run when the score is updated
     private MediaPlayer dropSoundPlayer; // MediaPlayer to play drop sound
     private Context context; // App context for sounds and prefs
+    private boolean isPaused = false;
 
     public int getScore() {
         return score;
@@ -63,6 +64,14 @@ public class BlockGameView extends View {
     public void setContext(Context context) {
         this.context = context;
         dropSoundPlayer = MediaPlayer.create(context, R.raw.drop_block);
+    }
+
+    public void pauseGame() {
+        isPaused = true;
+    }
+
+    public void resumeGame() {
+        isPaused = false;
     }
 
     public BlockGameView(Context context, AttributeSet attrs) {
@@ -111,8 +120,8 @@ public class BlockGameView extends View {
     }
 
     private void moveBlock() {
-        // Stop movement if the game is over or block doesn't exist
-        if (isGameOver || currentBlock == null) return;
+        // Stop movement if the game is over or block doesn't exist or game is paused
+        if (isGameOver || currentBlock == null || isPaused) return;
 
         float halfWidth = currentBlock.width / 2f; // Screen-edge collisions
         int BLOCK_SPEED = 4; // Block moving speed
@@ -322,8 +331,8 @@ public class BlockGameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // If the game is over or user interaction is disabled, touch is ignored
-        if (isGameOver || !tapEnabled) return false;
+        // If the game is over or user interaction is disabled or game is paused, touch is ignored
+        if (isGameOver || !tapEnabled || isPaused) return false;
 
         // When the user taps, the view calls performClick()
         if (event.getAction() == MotionEvent.ACTION_DOWN) {

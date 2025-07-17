@@ -17,7 +17,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,6 +42,10 @@ public class MainActivity extends MusicBoundActivity {
         previewView = findViewById(R.id.cameraPreview);
         gameView = findViewById(R.id.gameView);
         TextView tvScore = findViewById(R.id.tvScore);
+
+        ImageButton btnPause = findViewById(R.id.btnPause);
+        TextView tvCountdown = findViewById(R.id.tvCountdown);
+        final boolean[] isPaused = {false};
 
         // Request camera permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -66,6 +72,39 @@ public class MainActivity extends MusicBoundActivity {
 
         // Show alert when no face is found for 3 seconds
         faceAnalyzer.setFaceNotDetectedCallback(() -> runOnUiThread(this::showTryAgainDialog));
+
+        // Pause listener
+        btnPause.setOnClickListener(v -> {
+            if (!isPaused[0]) {
+                // Pause
+                isPaused[0] = true;
+                gameView.pauseGame();
+                btnPause.setImageResource(R.drawable.ic_play);
+            } else {
+                // Resume with countdown
+                btnPause.setVisibility(View.GONE);
+                tvCountdown.setVisibility(View.VISIBLE);
+                new CountDownTimer(3000, 1000) {
+                    int count = 3;
+
+                    // Countdown
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        tvCountdown.setText(String.valueOf(count--));
+                    }
+
+                    // After finishing countdown
+                    @Override
+                    public void onFinish() {
+                        isPaused[0] = false;
+                        gameView.resumeGame();
+                        btnPause.setImageResource(R.drawable.ic_pause);
+                        btnPause.setVisibility(View.VISIBLE);
+                        tvCountdown.setVisibility(View.GONE);
+                    }
+                }.start();
+            }
+        });
 
         // Game over callback
         gameView.setGameOverCallback(() -> runOnUiThread(() -> {

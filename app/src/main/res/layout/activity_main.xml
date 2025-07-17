@@ -33,6 +33,29 @@
         android:textColor="#FFFFFF"
         android:textSize="@dimen/score_text_size" />
 
+    <!-- Pause button -->
+    <ImageButton
+        android:id="@+id/btnPause"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/pause"
+        android:src="@drawable/ic_pause" />
+
+    <!-- Countdown overlay -->
+    <TextView
+        android:id="@+id/tvCountdown"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="64sp"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        android:textStyle="bold"
+        android:background="#99000000" />
+
     <!-- Game Over Overlay-->
     <include layout="@layout/game_over_overlay" />
 </FrameLayout>
