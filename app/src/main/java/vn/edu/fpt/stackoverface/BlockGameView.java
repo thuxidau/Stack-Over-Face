@@ -39,7 +39,7 @@ public class BlockGameView extends View {
     private Runnable scoreUpdateCallback; // Runnable to run when the score is updated
     private MediaPlayer dropSoundPlayer; // MediaPlayer to play drop sound
     private Context context; // App context for sounds and prefs
-    private boolean isPaused = false;
+    private boolean isPaused = false; // Whether the game is paused or not
 
     public int getScore() {
         return score;
@@ -148,8 +148,8 @@ public class BlockGameView extends View {
     }
 
     public void dropBlock() {
-        // If there's no active moving block, do nothing
-        if (currentBlock == null) return;
+        // If there's no active moving block or the game is paused, do nothing
+        if (currentBlock == null || isPaused) return;
 
         // Get the last stacked block
         Block last = stackBlocks.get(stackBlocks.size() - 1);
