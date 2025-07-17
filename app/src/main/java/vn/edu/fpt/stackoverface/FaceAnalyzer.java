@@ -111,4 +111,9 @@ public class FaceAnalyzer implements ImageAnalysis.Analyzer {
             })
             .addOnCompleteListener(task -> imageProxy.close()); // Always release the frame
     }
+
+    public static void resetState() {
+        lastFaceTime = System.currentTimeMillis();
+        faceWarningShown = false;
+    }
 }

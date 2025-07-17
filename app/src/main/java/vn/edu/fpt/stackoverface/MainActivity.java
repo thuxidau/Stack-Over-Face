@@ -72,6 +72,8 @@ public class MainActivity extends MusicBoundActivity {
             tvScore.setText(getString(R.string.score, gameView.getScore()));
         }));
 
+        FaceAnalyzer.resetState();
+
         // Show alert when no face is found for 3 seconds
         faceAnalyzer.setFaceNotDetectedCallback(() -> runOnUiThread(this::showTryAgainDialog));
 
