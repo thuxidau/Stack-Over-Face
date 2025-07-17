@@ -16,8 +16,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -158,6 +160,16 @@ public class MainActivity extends MusicBoundActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Always re-bind the camera when returning to app
+            startCamera();
+        }
+    }
+
     private void startCamera() {
         // Get camera provider
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
@@ -167,6 +179,8 @@ public class MainActivity extends MusicBoundActivity {
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+
+                cameraProvider.unbindAll(); // Unbind any previous use of the camera
 
                 // Set up camera preview
                 Preview preview = new Preview.Builder().build();
@@ -180,12 +194,8 @@ public class MainActivity extends MusicBoundActivity {
                 // Process each frame on the main thread
                 imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), faceAnalyzer);
 
-                // Choose the front camera (selfie camera)
-                CameraSelector cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA;
-
-                cameraProvider.unbindAll(); // Unbind any previous use of the camera
                 // Bind this camera + preview + analysis to the activity lifecycle (starts and stops automatically)
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
+                cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_FRONT_CAMERA, preview, imageAnalysis);
             }
             // If failed, show alert
             catch (ExecutionException | InterruptedException e) {
@@ -207,7 +217,7 @@ public class MainActivity extends MusicBoundActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCamera();
+                startCamera(); // Restart the camera preview and face analyzer
             } else {
                 showPermissionDialog();
             }
@@ -254,7 +264,7 @@ public class MainActivity extends MusicBoundActivity {
                     .setMessage("Allow camera access to play with blinks. Or switch to Tap Mode.")
                     .setCancelable(false)
                     .setPositiveButton("Switch to Tap Mode", (d, w) -> switchToTapMode())
-                    .setNegativeButton("Close", null)
+                    .setNegativeButton("Go to Settings", (d, w) -> openAppSettings())
                     .show();
         });
     }
@@ -284,5 +294,13 @@ public class MainActivity extends MusicBoundActivity {
                 faceAlertDialog = null;
             }
         });
+    }
+
+    // Open app settings
+    private void openAppSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 }
