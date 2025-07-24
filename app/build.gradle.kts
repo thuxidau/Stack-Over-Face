@@ -42,7 +42,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("com.google.mlkit:face-detection:16.1.7")
 
-    implementation("androidx.lifecycle:lifecycle-process:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.9.2")
     implementation("androidx.preference:preference:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
 
